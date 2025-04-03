@@ -1,0 +1,15 @@
+services:
+  business_management:
+    image: mysql
+    container_name: business_management
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    environment:
+      - MYSQL_USER=springuser
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=business_management
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - "./conf.d:/etc/mysql/conf.d:ro"
