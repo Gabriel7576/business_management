@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.business_management.domain.Store;
 
 @Repository
-public interface StoreRepository extends JpaRepository<Store, Integer> {
+public interface StoreRepository extends JpaRepository<Store, Long> {
 
 }
