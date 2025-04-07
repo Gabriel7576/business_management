@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "employee")
@@ -22,17 +24,26 @@ public class Employee {
     @Column(name = "name")
     private String name;
 
+    @Email()
     @Column(name = "email")
     private String email;
 
     @Column(name = "phone")
     private String phone;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull()
     @JoinColumn(name = "store_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private Store store;
 
     public Employee() {
+    }
+
+    public Employee(String name, String email, String phone, Store store) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.store = store;
     }
 
     public Long getEmployee_id() {
