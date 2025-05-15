@@ -2,9 +2,8 @@ package com.business_management.service;
 
 import com.business_management.domain.Employee;
 import com.business_management.domain.Store;
-import com.business_management.dto.request.EmployeeDTO;
-import com.business_management.dto.response.EmployeeCreationDTO;
-import com.business_management.dto.response.EmployeeUpdateDTO;
+import com.business_management.dto.request.EmployeeRequestDTO;
+import com.business_management.dto.response.EmployeeResponseDTO;
 import com.business_management.repository.EmployeeRepository;
 import com.business_management.repository.StoreRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,37 +23,39 @@ public class EmployeeService {
     @Autowired
     private StoreRepository storeRepository;
 
-    public Long saveEmployee(EmployeeCreationDTO creationDTO) {
+    public Long saveEmployee(EmployeeRequestDTO requestDTO) {
 
-        Store store = storeRepository.findById(creationDTO.store_id()).orElseThrow(() -> new EntityNotFoundException("Store not found with id " + creationDTO.store_id()));
+        Store store = storeRepository.findById(requestDTO.getStoreId()).orElseThrow(() -> new EntityNotFoundException("Store not found with id " + requestDTO.getStoreId()));
 
-        Employee employee = new Employee(creationDTO.name(), creationDTO.email(), creationDTO.phone(), store);
+        Employee employee = new Employee(requestDTO.getName(), requestDTO.getEmail(), requestDTO.getPhone(), store);
 
         Employee employeeSaved = repository.save(employee);
 
         return employeeSaved.getEmployee_id();
     }
 
-    public Optional<EmployeeDTO> findById(Long id) {
-        return repository.findById(id).map(employee -> new EmployeeDTO(employee.getEmployee_id(), employee.getName(), employee.getEmail(), employee.getPhone(), employee.getStore().getStore_id()));
+    public Optional<EmployeeResponseDTO> findById(Long id) {
+
+        return repository.findById(id).map(employee -> new EmployeeResponseDTO(employee.getEmployee_id(), employee.getName(), employee.getEmail(), employee.getPhone(), employee.getStore().getStore_id()));
     }
 
-    public List<EmployeeDTO> findAll() {
-        return repository.findAll().stream().map(employee -> new EmployeeDTO(employee.getEmployee_id(), employee.getName(), employee.getEmail(), employee.getPhone(), employee.getStore().getStore_id())).collect(Collectors.toList());
+    public List<EmployeeResponseDTO> findAll() {
+
+        return repository.findAll().stream().map(employee -> new EmployeeResponseDTO(employee.getEmployee_id(), employee.getName(), employee.getEmail(), employee.getPhone(), employee.getStore().getStore_id())).collect(Collectors.toList());
     }
 
-    public void updateEmployee(Long id, EmployeeUpdateDTO updateDTO) {
+    public void updateEmployee(Long id, EmployeeRequestDTO requestDTO) {
 
-        Optional<Employee> employeeEntity = repository.findById(id);
+        Optional<Employee> entity = repository.findById(id);
 
-        if (employeeEntity.isPresent()) {
-            Employee employee = employeeEntity.get();
+        if (entity.isPresent()) {
+            Employee employee = entity.get();
 
-            if (updateDTO.name() != null) employee.setName(updateDTO.name());
+            if (requestDTO.getName() != null) employee.setName(requestDTO.getName());
 
-            if (updateDTO.phone() != null) employee.setPhone(updateDTO.phone());
+            if (requestDTO.getPhone() != null) employee.setPhone(requestDTO.getPhone());
 
-            if (updateDTO.email() != null) employee.setEmail(updateDTO.email());
+            if (requestDTO.getEmail() != null) employee.setEmail(requestDTO.getEmail());
 
             repository.save(employee);
         }
@@ -63,9 +64,9 @@ public class EmployeeService {
 
     public void deleteById(Long id) {
 
-        Optional<Employee> EmployeeEntity = repository.findById(id);
+        Optional<Employee> entity = repository.findById(id);
 
-        if (EmployeeEntity.isPresent()) {
+        if (entity.isPresent()) {
             repository.deleteById(id);
         }
 

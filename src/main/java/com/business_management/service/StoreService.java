@@ -1,8 +1,8 @@
 package com.business_management.service;
 
 import com.business_management.domain.Store;
-import com.business_management.dto.response.StoreCreationDTO;
-import com.business_management.dto.response.StoreUpdateDTO;
+import com.business_management.dto.request.StoreRequestDTO;
+import com.business_management.dto.response.StoreResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +10,7 @@ import com.business_management.repository.StoreRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StoreService {
@@ -17,41 +18,42 @@ public class StoreService {
     @Autowired
     private StoreRepository repository;
 
-    public Long saveStore(StoreCreationDTO creationDTO) {
+    public Long saveStore(StoreRequestDTO requestDTO) {
 
-        Store entity = new Store(creationDTO.name(), creationDTO.address(), creationDTO.phone(), creationDTO.email());
+        Store entity = new Store(requestDTO.getName(), requestDTO.getAddress(), requestDTO.getPhone(), requestDTO.getEmail());
 
         Store storeSaved = repository.save(entity);
 
         return storeSaved.getStore_id();
     }
 
-    public Optional<Store> findById(Long id) {
-        return repository.findById(id);
+    public Optional<StoreResponseDTO> findById(Long id) {
+
+        return repository.findById(id).map(store -> new StoreResponseDTO(store.getStore_id(), store.getName(), store.getAddress(), store.getPhone(), store.getEmail()));
     }
 
-    public List<Store> findAll() {
-        return repository.findAll();
+    public List<StoreResponseDTO> findAll() {
+        return repository.findAll().stream().map(store -> new StoreResponseDTO(store.getStore_id(), store.getName(), store.getAddress(), store.getPhone(), store.getEmail())).collect(Collectors.toList());
     }
 
-    public void updateStore(Long id, StoreUpdateDTO updateDTO) {
+    public void updateStore(Long id, StoreRequestDTO requestDTO) {
 
-        Optional<Store> storeEntity = findById(id);
+        Optional<Store> entity = repository.findById(id);
 
-        if (storeEntity.isPresent()) {
-            Store store = storeEntity.get();
+        if (entity.isPresent()) {
+            Store store = entity.get();
 
-            if (updateDTO.name() != null)
-                store.setName(updateDTO.name());
+            if (requestDTO.getName() != null)
+                store.setName(requestDTO.getName());
 
-            if (updateDTO.address() != null)
-                store.setAddress(updateDTO.address());
+            if (requestDTO.getAddress() != null)
+                store.setAddress(requestDTO.getAddress());
 
-            if (updateDTO.phone() != null)
-                store.setPhone(updateDTO.phone());
+            if (requestDTO.getPhone() != null)
+                store.setPhone(requestDTO.getPhone());
 
-            if (updateDTO.email() != null)
-                store.setEmail(updateDTO.email());
+            if (requestDTO.getEmail() != null)
+                store.setEmail(requestDTO.getEmail());
 
             repository.save(store);
         }
@@ -60,9 +62,9 @@ public class StoreService {
 
     public void deleteById(Long id) {
 
-        Optional<Store> storeEntity = findById(id);
+        Optional<Store> entity = repository.findById(id);
 
-        if (storeEntity.isPresent()) {
+        if (entity.isPresent()) {
             repository.deleteById(id);
         }
 

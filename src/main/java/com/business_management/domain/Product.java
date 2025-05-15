@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -24,6 +25,9 @@ public class Product {
     @NotNull
     @Column(name = "price")
     private Double price;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<SaleItem> saleItems;
 
     public Product() {
     }
